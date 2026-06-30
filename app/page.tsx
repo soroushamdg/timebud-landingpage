@@ -137,15 +137,9 @@ export default function HomePage() {
         {/* ── SECTION 3: Founder / "me." ───────────────────────────────────── */}
         <section id="founder" className="section-padding">
           <Container>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 280px) 1fr",
-                gap: "3rem",
-                alignItems: "start",
-              }}
-            >
+            <div className="section-grid">
               <div
+                id="founder-image"
                 className="pixel-border"
                 style={{ aspectRatio: "1 / 1", overflow: "hidden", position: "relative" }}
               >
@@ -166,7 +160,7 @@ export default function HomePage() {
                 </h2>
 
                 {/* Sequential lines — GSAP swaps in Pass 2; line 0 visible by default */}
-                <div style={{ position: "relative", minHeight: "3rem" }}>
+                <div id="founder-lines" style={{ position: "relative", minHeight: "3rem" }}>
                   <p
                     id="founder-line-0"
                     style={{
@@ -339,14 +333,10 @@ export default function HomePage() {
           <Container>
             <div
               id="proof-content"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(0, 280px) 1fr",
-                gap: "3rem",
-                alignItems: "center",
-              }}
+              className="section-grid section-grid--center"
             >
               <div
+                id="proof-image"
                 className="pixel-border"
                 style={{ aspectRatio: "1 / 2.1", overflow: "hidden", position: "relative" }}
               >

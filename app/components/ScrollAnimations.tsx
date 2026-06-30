@@ -128,14 +128,20 @@ export default function ScrollAnimations() {
     let charEls: HTMLElement[] = [];
     if (problemTextEl) {
       const text = (problemTextEl.textContent ?? "").trim();
-      problemTextEl.innerHTML = text
-        .split("")
-        .map((char) =>
-          char === " "
-            ? `<span class="problem-char" style="display:inline-block;white-space:pre;"> </span>`
-            : `<span class="problem-char" style="display:inline-block;">${char}</span>`
-        )
-        .join("");
+      const words = text.split(" ");
+      let html = "";
+      for (let w = 0; w < words.length; w++) {
+        // Word wrapper keeps all chars in a word together — no mid-word line break
+        html += `<span style="display:inline-block;white-space:nowrap;">`;
+        for (const ch of words[w]) {
+          html += `<span class="problem-char" style="display:inline-block;">${ch}</span>`;
+        }
+        html += `</span>`;
+        if (w < words.length - 1) {
+          html += `<span class="problem-char" style="display:inline-block;white-space:pre;"> </span>`;
+        }
+      }
+      problemTextEl.innerHTML = html;
       charEls = Array.from(
         problemTextEl.querySelectorAll<HTMLElement>(".problem-char")
       );
@@ -166,8 +172,8 @@ export default function ScrollAnimations() {
       .to(
         charEls,
         {
-          y: () => gsap.utils.random(200, 600),
-          x: () => gsap.utils.random(-300, 300),
+          y: () => gsap.utils.random(window.innerHeight * 0.25, window.innerHeight * 0.7),
+          x: () => gsap.utils.random(-window.innerWidth * 0.4, window.innerWidth * 0.4),
           rotation: () => gsap.utils.random(-180, 180),
           opacity: 0,
           duration: 0.7,
@@ -178,12 +184,13 @@ export default function ScrollAnimations() {
       )
       // Fade strikethrough out with the shatter
       .to("#problem-strikethrough", { opacity: 0, duration: 0.4 }, "<")
-      // 3. Solution block drops in from above
+      // 3. Solution block drops in; problem block (label + remnants) fades out simultaneously
       .to(
         "#solution-block",
         { y: 0, opacity: 1, duration: 0.8, ease: "back.out(1.2)" },
         "+=0.25"
-      );
+      )
+      .to("#problem-block", { opacity: 0, duration: 0.5 }, "<");
 
     ScrollTrigger.create({
       trigger: "#problem-solution",

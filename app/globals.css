@@ -202,3 +202,66 @@ button, input, a[role="button"] {
   left: 0;
 }
 
+/* ── Responsive two-column section grid ──────────────────────────────────── */
+.section-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) 1fr;
+  gap: 3rem;
+  align-items: start;
+}
+
+.section-grid--center {
+  align-items: center;
+}
+
+/* ── Mobile breakpoint ───────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  /* Tighter section spacing */
+  .section-padding {
+    padding: 4rem 1.25rem;
+  }
+
+  /* Single-column grid */
+  .section-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  /* Explicit size + centre grid images — fill images need defined width AND height */
+  #founder-image {
+    width: 200px;
+    height: 200px;
+    margin-inline: auto;
+  }
+
+  #proof-image {
+    width: 140px;
+    height: 294px; /* 140 × 2.1 aspect ratio */
+    margin-inline: auto;
+  }
+
+  /* Taller container for multi-line founder copy */
+  #founder-lines {
+    min-height: 5rem;
+  }
+
+  /* Allow hero subtitle to wrap instead of overflow */
+  #hero-t2 {
+    white-space: normal;
+    max-width: 80vw;
+  }
+
+  /* Scale mascot down on small screens */
+  #mascot-thinking img,
+  #mascot-winking img {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  /* CTA try-free button full width on mobile */
+  #cta .pixel-btn {
+    display: block;
+    text-align: center;
+  }
+}
+
