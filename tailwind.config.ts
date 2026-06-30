@@ -9,11 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        yellow: "#FDC800",
+      },
+      fontFamily: {
+        pixel: ['"Press Start 2P"', "monospace"],
+        body: ['"Space Grotesk"', "system-ui", "sans-serif"],
       },
     },
   },
   plugins: [],
 };
+
 export default config;
