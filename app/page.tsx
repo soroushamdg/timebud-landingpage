@@ -365,7 +365,7 @@ export default function HomePage() {
               {/* Path 1: Try it free — no backend, plain link */}
               <div>
                 <a
-                  href="https://app.timebud.app"
+                  href="https://i.usetimebud.app/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="pixel-btn"
