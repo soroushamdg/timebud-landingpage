@@ -17,8 +17,9 @@ export default function ScrollAnimations() {
     gsap.ticker.lagSmoothing(0);
 
     // ── Initial states (set before first paint flash) ─────────────────────
-    // Mascot wrapper: GSAP owns all transforms. yPercent-50 = translateY(-50%), rotation = -25deg
-    gsap.set("#mascot-wrapper", { yPercent: -50, rotation: -25 });
+    const isMobile = window.innerWidth < 640;
+    // yPercent: -50 only makes sense when mascot is absolute-positioned with top:50%
+    gsap.set("#mascot-wrapper", { ...(isMobile ? {} : { yPercent: -50 }), rotation: -25 });
     // hero-t2: centered via xPercent, starts below + invisible
     gsap.set("#hero-t2", { xPercent: -50, y: 40, opacity: 0 });
     // Fade-in elements start invisible and 40px below

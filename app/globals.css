@@ -216,6 +216,19 @@ button, input, a[role="button"] {
 
 /* ── Mobile breakpoint ───────────────────────────────────────────────────── */
 @media (max-width: 640px) {
+  /* Hero: stack mascot above title in normal flow */
+  #hero {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  /* Pull mascot out of absolute positioning so it sits in the flex column */
+  #mascot-wrapper {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+
   /* Tighter section spacing */
   .section-padding {
     padding: 4rem 1.25rem;
