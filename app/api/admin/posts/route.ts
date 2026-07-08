@@ -55,6 +55,7 @@ export async function POST(request: Request) {
 
   let tags = Array.isArray(body.tags) ? body.tags.filter((t): t is string => typeof t === "string") : [];
   const coverImageUrl = typeof body.coverImageUrl === "string" ? body.coverImageUrl : null;
+  let excerpt = typeof body.excerpt === "string" && body.excerpt.trim() ? body.excerpt : null;
 
   let seoTitle = typeof body.seoTitle === "string" && body.seoTitle.trim() ? body.seoTitle : null;
   let description = typeof body.description === "string" && body.description.trim() ? body.description : null;
@@ -78,6 +79,7 @@ export async function POST(request: Request) {
       seoTitle = seoTitle ?? result.seoTitle;
       description = description ?? result.metaDescription;
       ogDescription = ogDescription ?? result.ogDescription;
+      excerpt = excerpt ?? result.excerpt;
       coverImageAlt = coverImageAlt ?? (result.coverImageAlt || null);
       if (tags.length === 0) tags = result.tags;
       if (relatedSlugs.length === 0) relatedSlugs = result.relatedSlugs;
@@ -93,7 +95,7 @@ export async function POST(request: Request) {
       slug,
       title,
       content,
-      excerpt: typeof body.excerpt === "string" ? body.excerpt : null,
+      excerpt,
       seoTitle,
       description,
       ogDescription,

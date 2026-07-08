@@ -108,6 +108,7 @@ export async function PATCH(request: Request, { params }: { params: { id: string
       updates.seoTitle = finalSeoTitle ?? result.seoTitle;
       updates.description = finalDescription ?? result.metaDescription;
       updates.ogDescription = (updates.ogDescription as string | undefined) ?? existing.ogDescription ?? result.ogDescription;
+      updates.excerpt = (updates.excerpt as string | undefined) ?? existing.excerpt ?? result.excerpt;
       updates.coverImageAlt =
         (updates.coverImageAlt as string | undefined) ?? existing.coverImageAlt ?? (result.coverImageAlt || null);
       const finalTags = (updates.tags as string[] | undefined) ?? existing.tags;

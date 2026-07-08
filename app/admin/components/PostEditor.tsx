@@ -50,6 +50,9 @@ export function PostEditor({ post }: { post?: Post }) {
   const [optimizing, setOptimizing] = useState(false);
   const [optimizeError, setOptimizeError] = useState("");
 
+  const [generatingField, setGeneratingField] = useState<"slug" | "tags" | "excerpt" | null>(null);
+  const [fieldError, setFieldError] = useState("");
+
   const [state, setState] = useState<State>("idle");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -90,6 +93,7 @@ export function PostEditor({ post }: { post?: Post }) {
         setDescription(result.metaDescription);
         setOgDescription(result.ogDescription);
         if (result.coverImageAlt) setCoverImageAlt(result.coverImageAlt);
+        if (!excerpt.trim() && result.excerpt) setExcerpt(result.excerpt);
         if (!tags.trim() && Array.isArray(result.tags)) setTags(result.tags.join(", "));
         if (Array.isArray(result.relatedSlugs)) setRelatedSlugs(result.relatedSlugs);
         if (Array.isArray(result.internalLinkSuggestions)) {
@@ -103,6 +107,42 @@ export function PostEditor({ post }: { post?: Post }) {
       setOptimizeError("Network error. Please try again.");
     } finally {
       setOptimizing(false);
+    }
+  }
+
+  async function handleGenerateField(field: "slug" | "tags" | "excerpt") {
+    if (!title.trim() || !content.trim()) {
+      setFieldError("Add a title and some content first.");
+      return;
+    }
+
+    setGeneratingField(field);
+    setFieldError("");
+
+    try {
+      const res = await fetch("/api/admin/generate-field", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ field, title, content }),
+      });
+      const data = await res.json();
+
+      if (data.ok) {
+        if (field === "slug") {
+          setSlug(data.value as string);
+          setSlugTouched(true);
+        } else if (field === "tags") {
+          setTags((data.value as string[]).join(", "));
+        } else if (field === "excerpt") {
+          setExcerpt(data.value as string);
+        }
+      } else {
+        setFieldError(data.error ?? "Something went wrong.");
+      }
+    } catch {
+      setFieldError("Network error. Please try again.");
+    } finally {
+      setGeneratingField(null);
     }
   }
 
@@ -210,7 +250,7 @@ export function PostEditor({ post }: { post?: Post }) {
             </>
           )}
 
-          <label style={{ ...fieldLabelStyle, marginTop: "1rem" }}>Slug</label>
+          <FieldLabelWithAi label="Slug" field="slug" generatingField={generatingField} onGenerate={handleGenerateField} />
           <input
             value={slug}
             onChange={(e) => {
@@ -221,7 +261,7 @@ export function PostEditor({ post }: { post?: Post }) {
             style={{ width: "100%", fontSize: "0.85rem" }}
           />
 
-          <label style={{ ...fieldLabelStyle, marginTop: "1rem" }}>Tags (comma separated)</label>
+          <FieldLabelWithAi label="Tags (comma separated)" field="tags" generatingField={generatingField} onGenerate={handleGenerateField} />
           <input
             value={tags}
             onChange={(e) => setTags(e.target.value)}
@@ -229,13 +269,22 @@ export function PostEditor({ post }: { post?: Post }) {
             style={{ width: "100%", fontSize: "0.85rem" }}
           />
 
-          <label style={{ ...fieldLabelStyle, marginTop: "1rem" }}>Excerpt</label>
+          <FieldLabelWithAi label="Excerpt" field="excerpt" generatingField={generatingField} onGenerate={handleGenerateField} />
           <textarea
             value={excerpt}
             onChange={(e) => setExcerpt(e.target.value)}
             className="pixel-input"
             style={{ width: "100%", fontSize: "0.85rem", minHeight: "70px", resize: "vertical" }}
           />
+
+          {fieldError && (
+            <p
+              className="error-msg"
+              style={{ fontSize: "0.8rem", borderLeft: "4px solid #000", paddingLeft: "0.5rem", marginTop: "1rem" }}
+            >
+              {fieldError}
+            </p>
+          )}
         </div>
 
         <div className="pixel-border" style={{ padding: "1.25rem", background: "var(--yellow)" }}>
@@ -366,3 +415,47 @@ const fieldLabelStyle: React.CSSProperties = {
   fontSize: "0.6rem",
   marginBottom: "0.4rem",
 };
+
+function FieldLabelWithAi({
+  label,
+  field,
+  generatingField,
+  onGenerate,
+}: {
+  label: string;
+  field: "slug" | "tags" | "excerpt";
+  generatingField: "slug" | "tags" | "excerpt" | null;
+  onGenerate: (field: "slug" | "tags" | "excerpt") => void;
+}) {
+  const busy = generatingField === field;
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginTop: "1rem",
+        marginBottom: "0.4rem",
+      }}
+    >
+      <label style={{ ...fieldLabelStyle, marginBottom: 0 }}>{label}</label>
+      <button
+        type="button"
+        onClick={() => onGenerate(field)}
+        disabled={generatingField !== null}
+        title={`Generate ${label.toLowerCase()} with AI`}
+        style={{
+          fontSize: "0.65rem",
+          padding: "0.15rem 0.45rem",
+          border: "2px solid var(--black)",
+          background: busy ? "var(--black)" : "var(--yellow)",
+          color: busy ? "var(--yellow)" : "var(--black)",
+          cursor: generatingField !== null ? "default" : "pointer",
+          fontFamily: "var(--font-body), sans-serif",
+        }}
+      >
+        {busy ? "…" : "✨ AI"}
+      </button>
+    </div>
+  );
+}

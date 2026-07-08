@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import WaitlistForm from "./components/WaitlistForm";
 import ScrollAnimations from "./components/ScrollAnimations";
 import LanguageSwitcher from "./components/LanguageSwitcher";
@@ -30,6 +31,31 @@ export default function HomePage() {
 
   return (
     <>
+      <Link
+        href="/blog"
+        style={{
+          position: "fixed",
+          top: "1.25rem",
+          left: "1.25rem",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.4rem",
+          background: "#000",
+          color: "#FDC800",
+          border: "3px solid #000",
+          borderRadius: 0,
+          padding: "0.5rem 0.75rem",
+          fontFamily: "var(--font-pixel), monospace",
+          fontSize: "0.6rem",
+          lineHeight: 1,
+          boxShadow: "3px 3px 0 rgba(0,0,0,0.25)",
+          whiteSpace: "nowrap",
+          textDecoration: "none",
+        }}
+      >
+        Blog
+      </Link>
       <LanguageSwitcher />
       <main style={{ background: "#FDC800", minHeight: "100vh" }}>
 
@@ -388,6 +414,23 @@ export default function HomePage() {
                   {s.iosNotify}
                 </p>
                 <WaitlistForm />
+              </div>
+
+              {/* Path 3: Read the blog */}
+              <div>
+                <p
+                  style={{
+                    fontFamily: "var(--font-body), sans-serif",
+                    fontSize: "clamp(0.9rem, 2vw, 1.1rem)",
+                    fontWeight: 700,
+                    marginBottom: "1rem",
+                  }}
+                >
+                  Want to read more first?
+                </p>
+                <Link href="/blog" className="pixel-btn-outline" style={{ fontSize: "0.875rem" }}>
+                  Read the blog →
+                </Link>
               </div>
 
               <p

@@ -1,6 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import { SEO_SYSTEM_PROMPT } from "./seo-prompt";
+import { EXCERPT_SYSTEM_PROMPT, SEO_SYSTEM_PROMPT, SLUG_SYSTEM_PROMPT, TAGS_SYSTEM_PROMPT } from "./seo-prompt";
 import type { InternalLinkSuggestion } from "@/db/schema";
 
 export interface SeoMetadataResult {
@@ -8,6 +8,7 @@ export interface SeoMetadataResult {
   metaDescription: string;
   ogDescription: string;
   slug: string;
+  excerpt: string;
   tags: string[];
   coverImageAlt: string;
   relatedSlugs: string[];
@@ -59,6 +60,11 @@ const GENERATE_SEO_TOOL: Anthropic.Tool = {
         description:
           "URL slug: lowercase, hyphen-separated, 3-6 words, no stopwords (a, the, of, to, and, in, for), no dates, no special characters. Mirrors the seoTitle's intent rather than repeating it verbatim.",
       },
+      excerpt: {
+        type: "string",
+        description:
+          "1-2 sentences, roughly 120-160 characters. A specific, concrete teaser of the post's core takeaway, written for a blog index card (not the search-result snippet — metaDescription covers that). No fluff, no fabricated claims.",
+      },
       tags: {
         type: "array",
         items: { type: "string" },
@@ -100,12 +106,73 @@ const GENERATE_SEO_TOOL: Anthropic.Tool = {
       "metaDescription",
       "ogDescription",
       "slug",
+      "excerpt",
       "tags",
       "coverImageAlt",
       "relatedSlugs",
       "internalLinkSuggestions",
     ],
   },
+};
+
+export type FieldName = "slug" | "tags" | "excerpt";
+
+const FIELD_TOOLS: Record<FieldName, Anthropic.Tool> = {
+  slug: {
+    name: "generate_slug",
+    description: "Generate a URL slug for a TimeBud blog post.",
+    input_schema: {
+      type: "object",
+      properties: {
+        slug: {
+          type: "string",
+          description:
+            "lowercase, hyphen-separated, 3-6 words, no stopwords (a, the, of, to, and, in, for), no dates, no special characters. Mirrors the post's core topic.",
+        },
+      },
+      required: ["slug"],
+    },
+  },
+  tags: {
+    name: "generate_tags",
+    description: "Generate topical tags for a TimeBud blog post.",
+    input_schema: {
+      type: "object",
+      properties: {
+        tags: {
+          type: "array",
+          items: { type: "string" },
+          description: "3 to 6 lowercase topical tags a reader would recognize. No hashtags, no punctuation.",
+        },
+      },
+      required: ["tags"],
+    },
+  },
+  excerpt: {
+    name: "generate_excerpt",
+    description: "Generate a short teaser excerpt for a TimeBud blog post.",
+    input_schema: {
+      type: "object",
+      properties: {
+        excerpt: {
+          type: "string",
+          description:
+            "1-2 sentences, roughly 120-160 characters. A specific, concrete teaser of the post's core takeaway, written for a blog index card. No fluff, no fabricated claims.",
+        },
+      },
+      required: ["excerpt"],
+    },
+  },
+};
+
+// Each field gets its own tailored persona/instructions rather than sharing
+// the generic batch prompt — see lib/seo-prompt.ts for why "write a good
+// slug" and "write a good excerpt" are different skills, not one instruction
+// repeated three times.
+const FIELD_SYSTEM_PROMPTS: Record<FieldName, string> = {
+  slug: SLUG_SYSTEM_PROMPT,
+  tags: TAGS_SYSTEM_PROMPT,
+  excerpt: EXCERPT_SYSTEM_PROMPT,
 };
 
 async function fetchImageAsBase64(url: string): Promise<{ data: string; mediaType: string } | null> {
@@ -192,4 +259,44 @@ export async function generateSeoMetadata({
   );
 
   return result;
+}
+
+/**
+ * Generates a single field (slug, tags, or excerpt) in isolation — used by
+ * the per-field "✨" buttons in the editor, so a writer can regenerate just
+ * one field without re-running the full SEO pass (which also touches
+ * meta/OG description, related posts, etc).
+ */
+export async function generateFieldSuggestion(
+  field: FieldName,
+  { title, content }: { title: string; content: string }
+): Promise<string | string[]> {
+  const anthropic = getClient();
+  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
+  const tool = FIELD_TOOLS[field];
+
+  const response = await anthropic.messages.create({
+    model,
+    max_tokens: 300,
+    system: FIELD_SYSTEM_PROMPTS[field],
+    tools: [tool],
+    tool_choice: { type: "tool", name: tool.name },
+    messages: [
+      {
+        role: "user",
+        content: `Post title: ${title}\n\nPost content (Markdown/MDX):\n\n${content}`,
+      },
+    ],
+  });
+
+  const toolUse = response.content.find(
+    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+  );
+
+  if (!toolUse) {
+    throw new Error(`Anthropic did not return a tool_use block for ${tool.name}`);
+  }
+
+  const input = toolUse.input as Record<string, string | string[]>;
+  return input[field];
 }
