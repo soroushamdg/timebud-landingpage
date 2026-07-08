@@ -249,6 +249,21 @@ export async function generateSeoMetadata({
 
   const result = toolUse.input as SeoMetadataResult;
 
+  // The tool schema's `required` only guarantees the keys exist, not that the
+  // strings are non-empty — a blank seoTitle would otherwise silently "succeed"
+  // and leave the editor field looking like generation just did nothing.
+  const requiredStringFields: Array<keyof SeoMetadataResult> = [
+    "seoTitle",
+    "metaDescription",
+    "ogDescription",
+    "slug",
+    "excerpt",
+  ];
+  const emptyField = requiredStringFields.find((field) => !String(result[field] ?? "").trim());
+  if (emptyField) {
+    throw new Error(`Anthropic returned an empty "${emptyField}" for generate_seo_metadata`);
+  }
+
   // Defensive: the model is instructed to only reference provided slugs, but
   // since these become real links on the live site, filter out anything it
   // hallucinated rather than trusting the instruction alone.
@@ -298,5 +313,12 @@ export async function generateFieldSuggestion(
   }
 
   const input = toolUse.input as Record<string, string | string[]>;
-  return input[field];
+  const value = input[field];
+
+  const isEmpty = Array.isArray(value) ? value.length === 0 : !String(value ?? "").trim();
+  if (isEmpty) {
+    throw new Error(`Anthropic returned an empty "${field}" for ${tool.name}`);
+  }
+
+  return value;
 }
