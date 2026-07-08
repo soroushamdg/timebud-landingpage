@@ -18,7 +18,14 @@ function getDb(): NeonHttpDatabase<typeof schema> {
     throw new Error("DATABASE_URL is not set — see .env.local.example");
   }
 
-  cached = drizzle(neon(url), { schema });
+  // The Neon HTTP driver issues queries via `fetch()` under the hood. On
+  // Vercel, Next.js patches global `fetch` and caches responses by default —
+  // that caching happens at the fetch call itself, independent of a page's
+  // `dynamic = "force-dynamic"` export. Without `cache: "no-store"` here,
+  // production could keep serving a stale query result (e.g. a post list
+  // missing a just-created row) indefinitely, while local `next dev` (which
+  // has no Data Cache) never showed the problem.
+  cached = drizzle(neon(url, { fetchOptions: { cache: "no-store" } }), { schema });
   return cached;
 }
 
