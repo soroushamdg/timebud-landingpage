@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "./components/PostCard";
@@ -23,7 +24,28 @@ export default async function BlogIndexPage() {
   const posts = await getPublishedPosts();
 
   return (
-    <main className="section-padding" style={{ maxWidth: "1100px", margin: "0 auto" }}>
+    <main
+      className="section-padding"
+      style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", overflow: "hidden" }}
+    >
+      <Image
+        src="/happy.png"
+        alt="TimeBud mascot smiling"
+        width={484}
+        height={465}
+        priority
+        style={{
+          position: "absolute",
+          top: "1.5rem",
+          right: "1.5rem",
+          width: "clamp(64px, 14vw, 150px)",
+          height: "auto",
+          transform: "rotate(35deg)",
+          imageRendering: "pixelated",
+          pointerEvents: "none",
+        }}
+      />
+
       <div style={{ marginBottom: "3rem" }}>
         <Link href="/" style={{ fontSize: "0.875rem", textDecoration: "underline" }}>
           ← Back to TimeBud

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { slugify } from "@/lib/slug";
 import type { Post } from "@/db/schema";
@@ -23,7 +22,6 @@ function toDatetimeLocalValue(date: Date | string): string {
 }
 
 export function PostEditor({ post }: { post?: Post }) {
-  const router = useRouter();
   const isEditing = Boolean(post);
 
   const [title, setTitle] = useState(post?.title ?? "");
@@ -192,8 +190,10 @@ export function PostEditor({ post }: { post?: Post }) {
       const data = await res.json();
 
       if (data.ok) {
-        router.push("/admin");
-        router.refresh();
+        // Hard navigation, not router.push()+refresh() — that pair can race
+        // with Next's client-side Router Cache and show a stale (pre-save)
+        // dashboard. A full navigation guarantees the list reflects the save.
+        window.location.href = "/admin";
       } else {
         setState("error");
         setErrorMsg(data.error ?? "Something went wrong.");

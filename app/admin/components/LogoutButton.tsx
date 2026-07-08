@@ -1,14 +1,11 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-
 export function LogoutButton() {
-  const router = useRouter();
-
   async function handleLogout() {
     await fetch("/api/admin/logout", { method: "POST" });
-    router.push("/admin/login");
-    router.refresh();
+    // Hard navigation — see PostEditor.tsx for why push()+refresh() is avoided;
+    // it also ensures no cached authenticated page is reachable via back button.
+    window.location.href = "/admin/login";
   }
 
   return (

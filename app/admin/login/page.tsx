@@ -1,12 +1,10 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 
 type State = "idle" | "loading" | "error";
 
 export default function AdminLoginPage() {
-  const router = useRouter();
   const [state, setState] = useState<State>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -28,8 +26,8 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (data.ok) {
-        router.push("/admin");
-        router.refresh();
+        // Hard navigation — see PostEditor.tsx for why push()+refresh() is avoided.
+        window.location.href = "/admin";
       } else {
         setState("error");
         setErrorMsg(data.error ?? "Something went wrong.");
