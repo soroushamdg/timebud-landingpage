@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
           <p style="color:#000;font-size:14px;line-height:1.6;">
             We'll let you know the moment TimeBud lands on iOS.<br><br>
             In the meantime, the web version is live — give it a try at
-            <a href="https://app.timebud.app" style="color:#000;">app.timebud.app</a>.
+            <a href="https://i.usetimebud.app/" style="color:#000;">i.usetimebud.app</a>.
           </p>
           <p style="color:#000;font-size:12px;margin-top:32px;">— TimeBud</p>
         </div>

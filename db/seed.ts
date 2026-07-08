@@ -33,7 +33,7 @@ Externalizing prioritization — having the app decide "what's next" — removes
 - One visible "next thing," not forty
 - Momentum-based rewards, not guilt-based streaks
 
-<CTAButton href="https://app.timebud.app" label="Try TimeBud free" />
+<CTAButton href="https://i.usetimebud.app/" label="Try TimeBud free" />
 `,
   },
   {
@@ -59,7 +59,7 @@ Task-switching has a real cognitive cost — and for ADHD brains, the cost of *r
 
 Batch the two-minute tasks. Let them queue up, then clear them in one dedicated block — instead of letting them interrupt whatever you were actually building momentum on.
 
-<CTAButton href="https://app.timebud.app" label="See how TimeBud batches quick tasks" />
+<CTAButton href="https://i.usetimebud.app/" label="See how TimeBud batches quick tasks" />
 `,
   },
   {
@@ -83,7 +83,7 @@ Hyperfocus doesn't respond to your priorities — it responds to whatever is mos
 Setting a single external checkpoint (a timer, a scheduled break) before you start is the only thing that reliably interrupts hyperfocus without killing it.
 </Callout>
 
-<CTAButton href="https://app.timebud.app" label="Try TimeBud free" />
+<CTAButton href="https://i.usetimebud.app/" label="Try TimeBud free" />
 `,
   },
 ] as const;

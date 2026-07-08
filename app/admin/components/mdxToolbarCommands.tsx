@@ -8,7 +8,7 @@ export const ctaButtonCommand: ICommand = {
     <span style={{ fontSize: "11px", fontWeight: 700, fontFamily: "monospace" }}>[CTA]</span>
   ),
   execute: (_state: TextState, api: TextAreaTextApi) => {
-    api.replaceSelection('<CTAButton href="https://app.timebud.app" label="Try TimeBud free" />');
+    api.replaceSelection('<CTAButton href="https://i.usetimebud.app/" label="Try TimeBud free" />');
   },
 };
 
