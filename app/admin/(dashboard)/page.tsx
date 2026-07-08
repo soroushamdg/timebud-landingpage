@@ -1,5 +1,6 @@
 import { getAllPostsForAdmin } from "@/lib/posts";
 import { PostRowActions } from "../components/PostRowActions";
+import { StatusBadge } from "../components/StatusBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -33,17 +34,7 @@ export default async function AdminDashboardPage() {
               <div style={{ minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
                   <strong style={{ fontSize: "1rem" }}>{post.title}</strong>
-                  <span
-                    className="pixel-tag"
-                    style={{
-                      background: post.status === "published" ? "var(--black)" : "var(--yellow)",
-                      color: post.status === "published" ? "var(--yellow)" : "var(--black)",
-                    }}
-                  >
-                    {post.status === "scheduled" && post.scheduledAt
-                      ? `scheduled · ${new Date(post.scheduledAt).toLocaleString()}`
-                      : post.status}
-                  </span>
+                  <StatusBadge status={post.status} scheduledAt={post.scheduledAt} />
                 </div>
                 <p style={{ fontSize: "0.85rem", opacity: 0.75, margin: "0.4rem 0 0" }}>
                   /blog/{post.slug} · {post.readingTimeMinutes} min read

@@ -36,7 +36,8 @@ General rules that apply across every field:
 - Base everything strictly on the provided content. Do not invent numbers, outcomes, or claims beyond what the post says.
 - Write for a human reader first. Never keyword-stuff — repeating the target keyword unnaturally reads as spam to readers and actively hurts (not just fails to help) both traditional and AI-search visibility.
 - Prefer specific, concrete language over vague marketing language ("cut your setup time in half" beats "streamline your workflow").
-- Match the direct, plain-spoken brand voice described above in every field, including the slug and tags.`;
+- Match the direct, plain-spoken brand voice described above in every field, including the slug and tags.
+- You MUST include every field listed in the tool schema in your response — never omit one. If you judge that a field's ideal value is identical to something already given to you (e.g. the post's title is already a strong seoTitle as-is), you still must explicitly include that field with that value. "No change needed" is never a reason to leave a field out of the tool call.`;
 
 // Informed by seo-audit's "URL Structure" section (readable, descriptive
 // URLs; keywords in URLs where natural; consistent structure; lowercase and
@@ -53,7 +54,8 @@ Rules (hard limits, not suggestions):
 - Drop stopwords (a, the, of, to, and, in, for) — they add length without adding meaning to a URL.
 - No dates, no special characters, no version numbers.
 - Lead with the post's primary keyword/topic, not a word-for-word copy of the title — a slug mirrors intent, it doesn't transcribe.
-- Never keyword-stuff by cramming synonyms in — one clear topic per slug.`;
+- Never keyword-stuff by cramming synonyms in — one clear topic per slug.
+- Always include the slug field in your tool call, even if the most natural slug happens to closely match a straightforward reading of the title — never omit the field.`;
 
 // Informed by seo-audit's "Keyword Targeting" (site-wide: keyword mapping,
 // no cannibalization, logical topical clusters) and ai-seo's query fan-out
@@ -69,7 +71,8 @@ Rules (hard limits, not suggestions):
 - 3 to 6 tags, lowercase, no hashtags, no punctuation.
 - Each tag should be a topic broad enough that other, future posts could plausibly share it (e.g. "adhd", "focus", "habits") — never an ultra-specific phrase that will only ever apply to this single post.
 - Don't just restate the title's exact wording as a tag; think about which existing topical cluster this post belongs to.
-- No duplicate or near-duplicate tags (e.g. don't return both "focus" and "focusing").`;
+- No duplicate or near-duplicate tags (e.g. don't return both "focus" and "focusing").
+- Always include the tags field in your tool call — never omit it, even if you're only confident about 3.`;
 
 // Informed by the copywriting skill's core principles (specificity over
 // vagueness, customer language, active voice, "honest over sensational" — no
@@ -86,4 +89,5 @@ Rules (hard limits, not suggestions):
 - Be specific, not vague: name the concrete takeaway or fix the post delivers, not a generic restatement of the title ("cut your setup time in half" beats "tips for managing your time").
 - Active voice, no hedging words ("might", "could potentially").
 - Never fabricate a statistic, outcome, or claim that isn't in the post content.
-- No exclamation points, no clickbait phrasing ("You won't believe...", "This one trick...").`;
+- No exclamation points, no clickbait phrasing ("You won't believe...", "This one trick...").
+- Always include the excerpt field in your tool call — never omit it.`;

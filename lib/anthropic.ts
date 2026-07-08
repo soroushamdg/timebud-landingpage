@@ -33,6 +33,28 @@ function getClient(): Anthropic {
   return client;
 }
 
+/**
+ * The model occasionally omits a required tool-call field entirely (observed:
+ * skipping `seoTitle` when the given post title was already strong, treating
+ * "no change needed" as "nothing to report" rather than echoing it back).
+ * This isn't reliably fixed by prompting alone — it's not fully deterministic,
+ * so a retry with the same (now more explicit) prompt has a good chance of
+ * succeeding even when a prior attempt didn't. Retry a few times before
+ * giving up.
+ */
+async function withRetries<T>(attempt: () => Promise<T>, maxAttempts = 3): Promise<T> {
+  let lastError: unknown;
+  for (let i = 1; i <= maxAttempts; i++) {
+    try {
+      return await attempt();
+    } catch (err) {
+      lastError = err;
+      console.warn(`AI generation attempt ${i}/${maxAttempts} failed:`, err);
+    }
+  }
+  throw lastError;
+}
+
 const GENERATE_SEO_TOOL: Anthropic.Tool = {
   name: "generate_seo_metadata",
   description:
@@ -43,7 +65,7 @@ const GENERATE_SEO_TOOL: Anthropic.Tool = {
       seoTitle: {
         type: "string",
         description:
-          "The page <title>. 50-60 characters including spaces. Primary keyword near the front. Specific and click-worthy, never clickbait. Do not append the brand name — it is not shown in the browser tab for blog posts.",
+          "The page <title>. 50-60 characters including spaces. Primary keyword near the front. Specific and click-worthy, never clickbait. Do not append the brand name — it is not shown in the browser tab for blog posts. MANDATORY FIELD: if the post's given title is already a strong SEO title as-is, return it verbatim here — never omit this field just because no change was needed.",
       },
       metaDescription: {
         type: "string",
@@ -230,50 +252,52 @@ export async function generateSeoMetadata({
     });
   }
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 1536,
-    system: SEO_SYSTEM_PROMPT,
-    tools: [GENERATE_SEO_TOOL],
-    tool_choice: { type: "tool", name: "generate_seo_metadata" },
-    messages: [{ role: "user", content: userContent }],
+  return withRetries(async () => {
+    const response = await anthropic.messages.create({
+      model,
+      max_tokens: 1536,
+      system: SEO_SYSTEM_PROMPT,
+      tools: [GENERATE_SEO_TOOL],
+      tool_choice: { type: "tool", name: "generate_seo_metadata" },
+      messages: [{ role: "user", content: userContent }],
+    });
+
+    const toolUse = response.content.find(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+    );
+
+    if (!toolUse) {
+      throw new Error("Anthropic did not return a tool_use block for generate_seo_metadata");
+    }
+
+    const result = toolUse.input as SeoMetadataResult;
+
+    // The tool schema's `required` only guarantees the keys exist, not that the
+    // strings are non-empty — a blank seoTitle would otherwise silently "succeed"
+    // and leave the editor field looking like generation just did nothing.
+    const requiredStringFields: Array<keyof SeoMetadataResult> = [
+      "seoTitle",
+      "metaDescription",
+      "ogDescription",
+      "slug",
+      "excerpt",
+    ];
+    const emptyField = requiredStringFields.find((field) => !String(result[field] ?? "").trim());
+    if (emptyField) {
+      throw new Error(`Anthropic returned an empty "${emptyField}" for generate_seo_metadata`);
+    }
+
+    // Defensive: the model is instructed to only reference provided slugs, but
+    // since these become real links on the live site, filter out anything it
+    // hallucinated rather than trusting the instruction alone.
+    const validSlugs = new Set(otherPosts.map((p) => p.slug));
+    result.relatedSlugs = (result.relatedSlugs ?? []).filter((s) => validSlugs.has(s));
+    result.internalLinkSuggestions = (result.internalLinkSuggestions ?? []).filter((s) =>
+      validSlugs.has(s.targetSlug)
+    );
+
+    return result;
   });
-
-  const toolUse = response.content.find(
-    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
-  );
-
-  if (!toolUse) {
-    throw new Error("Anthropic did not return a tool_use block for generate_seo_metadata");
-  }
-
-  const result = toolUse.input as SeoMetadataResult;
-
-  // The tool schema's `required` only guarantees the keys exist, not that the
-  // strings are non-empty — a blank seoTitle would otherwise silently "succeed"
-  // and leave the editor field looking like generation just did nothing.
-  const requiredStringFields: Array<keyof SeoMetadataResult> = [
-    "seoTitle",
-    "metaDescription",
-    "ogDescription",
-    "slug",
-    "excerpt",
-  ];
-  const emptyField = requiredStringFields.find((field) => !String(result[field] ?? "").trim());
-  if (emptyField) {
-    throw new Error(`Anthropic returned an empty "${emptyField}" for generate_seo_metadata`);
-  }
-
-  // Defensive: the model is instructed to only reference provided slugs, but
-  // since these become real links on the live site, filter out anything it
-  // hallucinated rather than trusting the instruction alone.
-  const validSlugs = new Set(otherPosts.map((p) => p.slug));
-  result.relatedSlugs = (result.relatedSlugs ?? []).filter((s) => validSlugs.has(s));
-  result.internalLinkSuggestions = (result.internalLinkSuggestions ?? []).filter((s) =>
-    validSlugs.has(s.targetSlug)
-  );
-
-  return result;
 }
 
 /**
@@ -290,35 +314,37 @@ export async function generateFieldSuggestion(
   const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
   const tool = FIELD_TOOLS[field];
 
-  const response = await anthropic.messages.create({
-    model,
-    max_tokens: 300,
-    system: FIELD_SYSTEM_PROMPTS[field],
-    tools: [tool],
-    tool_choice: { type: "tool", name: tool.name },
-    messages: [
-      {
-        role: "user",
-        content: `Post title: ${title}\n\nPost content (Markdown/MDX):\n\n${content}`,
-      },
-    ],
+  return withRetries(async () => {
+    const response = await anthropic.messages.create({
+      model,
+      max_tokens: 300,
+      system: FIELD_SYSTEM_PROMPTS[field],
+      tools: [tool],
+      tool_choice: { type: "tool", name: tool.name },
+      messages: [
+        {
+          role: "user",
+          content: `Post title: ${title}\n\nPost content (Markdown/MDX):\n\n${content}`,
+        },
+      ],
+    });
+
+    const toolUse = response.content.find(
+      (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
+    );
+
+    if (!toolUse) {
+      throw new Error(`Anthropic did not return a tool_use block for ${tool.name}`);
+    }
+
+    const input = toolUse.input as Record<string, string | string[]>;
+    const value = input[field];
+
+    const isEmpty = Array.isArray(value) ? value.length === 0 : !String(value ?? "").trim();
+    if (isEmpty) {
+      throw new Error(`Anthropic returned an empty "${field}" for ${tool.name}`);
+    }
+
+    return value;
   });
-
-  const toolUse = response.content.find(
-    (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
-  );
-
-  if (!toolUse) {
-    throw new Error(`Anthropic did not return a tool_use block for ${tool.name}`);
-  }
-
-  const input = toolUse.input as Record<string, string | string[]>;
-  const value = input[field];
-
-  const isEmpty = Array.isArray(value) ? value.length === 0 : !String(value ?? "").trim();
-  if (isEmpty) {
-    throw new Error(`Anthropic returned an empty "${field}" for ${tool.name}`);
-  }
-
-  return value;
 }
