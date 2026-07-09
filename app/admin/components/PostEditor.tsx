@@ -370,7 +370,7 @@ export function PostEditor({ post }: { post?: Post }) {
           {internalLinkSuggestions.length > 0 && (
             <>
               <label style={{ ...fieldLabelStyle, marginTop: "1rem" }}>
-                Internal link suggestions (AI-suggested — copy into the body if you like one)
+                Internal links (AI-suggested — auto-inserted into the published post when the anchor text matches)
               </label>
               <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
                 {internalLinkSuggestions.map((s, i) => (

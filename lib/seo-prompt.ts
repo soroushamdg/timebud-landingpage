@@ -23,9 +23,12 @@ const BRAND_VOICE = `TimeBud is a task/time-management app built for ADHD and fo
 //   against copywriting's "honest over sensational" — never invent numbers
 //   that aren't in the source content.
 // - relatedSlugs/internalLinkSuggestions apply seo-audit's "Internal Linking"
-//   guidance (important pages should be well-linked, anchor text descriptive)
-//   without letting the model touch the post body directly — it only
-//   *suggests*, the human applies it, so a bad suggestion can't corrupt content.
+//   guidance (important pages should be well-linked, anchor text descriptive).
+//   internalLinkSuggestions are auto-spliced into the rendered post body at
+//   request time (lib/internal-links.ts) — never persisted back into content
+//   — so anchorText must be an exact verbatim substring of the post or the
+//   link silently fails to appear; a bad/hallucinated suggestion can't corrupt
+//   the stored content either way since injection happens at render time.
 export const SEO_SYSTEM_PROMPT = `You are an SEO and conversion copywriter for the TimeBud blog.
 
 ${BRAND_VOICE}
@@ -37,7 +40,8 @@ General rules that apply across every field:
 - Write for a human reader first. Never keyword-stuff — repeating the target keyword unnaturally reads as spam to readers and actively hurts (not just fails to help) both traditional and AI-search visibility.
 - Prefer specific, concrete language over vague marketing language ("cut your setup time in half" beats "streamline your workflow").
 - Match the direct, plain-spoken brand voice described above in every field, including the slug and tags.
-- You MUST include every field listed in the tool schema in your response — never omit one. If you judge that a field's ideal value is identical to something already given to you (e.g. the post's title is already a strong seoTitle as-is), you still must explicitly include that field with that value. "No change needed" is never a reason to leave a field out of the tool call.`;
+- You MUST include every field listed in the tool schema in your response — never omit one. If you judge that a field's ideal value is identical to something already given to you (e.g. the post's title is already a strong seoTitle as-is), you still must explicitly include that field with that value. "No change needed" is never a reason to leave a field out of the tool call.
+- internalLinkSuggestions.anchorText is auto-inserted as a real link into the live post — it MUST be copied character-for-character from the post content given to you, never paraphrased, or the link will silently fail to appear.`;
 
 // Informed by seo-audit's "URL Structure" section (readable, descriptive
 // URLs; keywords in URLs where natural; consistent structure; lowercase and

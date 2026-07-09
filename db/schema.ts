@@ -43,8 +43,10 @@ export const posts = pgTable("posts", {
   aiMeta: jsonb("ai_meta"),
 
   // AI-suggested related posts (slugs, must reference existing posts) and
-  // internal-link suggestions (anchor text + target slug) — surfaced in the
-  // admin UI for the human to apply; never auto-inserted into content.
+  // internal-link suggestions (anchor text + target slug). Both are rendered
+  // automatically on the public post page (RelatedPosts widget, and
+  // lib/internal-links.ts splices internalLinkSuggestions into the body at
+  // request time) — content here is never mutated, injection is display-only.
   relatedSlugs: jsonb("related_slugs").$type<string[]>().notNull().default([]),
   internalLinkSuggestions: jsonb("internal_link_suggestions")
     .$type<InternalLinkSuggestion[]>()

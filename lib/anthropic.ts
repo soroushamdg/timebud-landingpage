@@ -110,7 +110,8 @@ const GENERATE_SEO_TOOL: Anthropic.Tool = {
           properties: {
             anchorText: {
               type: "string",
-              description: "A short phrase (2-6 words) that plausibly appears in or fits naturally into the post's body copy.",
+              description:
+                "A short phrase (2-6 words) copied VERBATIM, character-for-character, from the post content provided below — not a paraphrase or invented phrase. This exact string is matched against the post body to auto-insert a link, so if it does not appear exactly as given, the link silently fails to appear.",
             },
             targetSlug: {
               type: "string",
@@ -120,7 +121,7 @@ const GENERATE_SEO_TOOL: Anthropic.Tool = {
           required: ["anchorText", "targetSlug"],
         },
         description:
-          "0 to 3 internal-linking suggestions: a natural anchor phrase paired with which existing post it could link to. These are shown to the human editor to manually add — never fabricate a targetSlug outside the provided list. Empty array if nothing fits naturally.",
+          "0 to 3 internal-linking suggestions: a natural anchor phrase (copied verbatim from the post body) paired with which existing post it could link to. These are auto-inserted as real links into the published post body — never fabricate a targetSlug outside the provided list, and never fabricate anchorText that isn't an exact substring of the content. Empty array if nothing fits naturally.",
       },
     },
     required: [
@@ -287,13 +288,16 @@ export async function generateSeoMetadata({
       throw new Error(`Anthropic returned an empty "${emptyField}" for generate_seo_metadata`);
     }
 
-    // Defensive: the model is instructed to only reference provided slugs, but
-    // since these become real links on the live site, filter out anything it
-    // hallucinated rather than trusting the instruction alone.
+    // Defensive: the model is instructed to only reference provided slugs and
+    // to copy anchorText verbatim, but since these become real auto-inserted
+    // links on the live site, filter out anything it hallucinated or
+    // paraphrased rather than trusting the instruction alone — a suggestion
+    // whose anchorText isn't an exact substring of the post content can never
+    // actually be linked (see lib/internal-links.ts), so drop it here too.
     const validSlugs = new Set(otherPosts.map((p) => p.slug));
     result.relatedSlugs = (result.relatedSlugs ?? []).filter((s) => validSlugs.has(s));
-    result.internalLinkSuggestions = (result.internalLinkSuggestions ?? []).filter((s) =>
-      validSlugs.has(s.targetSlug)
+    result.internalLinkSuggestions = (result.internalLinkSuggestions ?? []).filter(
+      (s) => validSlugs.has(s.targetSlug) && content.includes(s.anchorText)
     );
 
     return result;

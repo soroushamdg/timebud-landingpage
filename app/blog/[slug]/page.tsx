@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPublishedPostByPreviousSlug, getPublishedPostBySlug, getRelatedPosts } from "@/lib/posts";
 import { mdxComponents } from "@/lib/mdx-components";
+import { injectInternalLinks } from "@/lib/internal-links";
 import { SITE_URL } from "@/lib/site";
 import { PostMeta } from "../components/PostMeta";
 import { RelatedPosts } from "../components/RelatedPosts";
@@ -60,6 +61,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
   }
 
   const relatedPosts = await getRelatedPosts(post);
+  const renderedContent = injectInternalLinks(post.content, post.internalLinkSuggestions);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -123,7 +125,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       ) : null}
 
       <article className="blog-prose">
-        <MDXRemote source={post.content} components={mdxComponents} />
+        <MDXRemote source={renderedContent} components={mdxComponents} />
       </article>
 
       <RelatedPosts posts={relatedPosts} />
