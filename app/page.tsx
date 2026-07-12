@@ -57,6 +57,31 @@ export default function HomePage() {
         Blog
       </Link>
       <LanguageSwitcher />
+      <div
+        id="scroll-hint"
+        style={{
+          position: "fixed",
+          bottom: "1.5rem",
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 40,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "0.4rem",
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          className="display-font"
+          style={{ fontSize: "0.6rem", letterSpacing: "0.05em", color: "#000" }}
+        >
+          {s.scrollHint}
+        </span>
+        <span className="scroll-hint-arrow" style={{ fontSize: "1rem", lineHeight: 1 }}>
+          ↓
+        </span>
+      </div>
       <main style={{ background: "#FDC800", minHeight: "100vh" }}>
 
         {/* ── SECTION 1: Hero ──────────────────────────────────────────────── */}

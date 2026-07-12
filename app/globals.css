@@ -120,6 +120,17 @@ button, input, a[role="button"] {
   }
 }
 
+/* ── Scroll hint — bouncing arrow at bottom of viewport ──────────────────── */
+@keyframes scroll-hint-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
+.scroll-hint-arrow {
+  display: inline-block;
+  animation: scroll-hint-bounce 1.4s ease-in-out infinite;
+}
+
 /* ── Proof blockquote — logical border (flips in RTL) ───────────────────── */
 .proof-quote {
   font-family: var(--font-body), sans-serif;

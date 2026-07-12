@@ -66,6 +66,19 @@ export default function ScrollAnimations() {
       invalidateOnRefresh: true,
     });
 
+    // ── Scroll hint — fades out as soon as the user starts scrolling ──────
+    gsap.to("#scroll-hint", {
+      opacity: 0,
+      duration: 0.3,
+      ease: "power1.out",
+      scrollTrigger: {
+        trigger: "#hero",
+        start: "top top",
+        end: "+=120",
+        scrub: true,
+      },
+    });
+
     // ── SECTION 2: Tagline — fade in ─────────────────────────────────────
     gsap.to("#tagline-text", {
       y: 0,

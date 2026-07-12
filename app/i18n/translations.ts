@@ -20,6 +20,7 @@ export interface Strings {
   emailPlaceholder: string;
   successMsg: string;
   footerNote: string;
+  scrollHint: string;
 }
 
 export const RTL_LANGS: LangCode[] = ["fa", "ar"];
@@ -56,6 +57,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "your@email.com",
     successMsg: "you're in. we'll ping you.",
     footerNote: "Free to try. Web version live, iOS coming soon.",
+    scrollHint: "Scroll to continue",
   },
 
   fr: {
@@ -78,6 +80,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "ton@email.com",
     successMsg: "c'est dans la boîte. on te ping.",
     footerNote: "Gratuit. Version web disponible, iOS bientôt.",
+    scrollHint: "Défile pour continuer",
   },
 
   de: {
@@ -100,6 +103,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "deine@email.de",
     successMsg: "du bist dabei. wir melden uns.",
     footerNote: "Kostenlos testen. Web-Version live, iOS bald.",
+    scrollHint: "Scrollen zum Fortfahren",
   },
 
   fa: {
@@ -122,6 +126,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "ایمیل@شما.com",
     successMsg: "ثبت شدی. خبرت می‌دیم.",
     footerNote: "رایگان. نسخه وب آنلاین است، iOS به زودی.",
+    scrollHint: "برای ادامه اسکرول کن",
   },
 
   ar: {
@@ -144,6 +149,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "بريدك@الإلكتروني.com",
     successMsg: "سُجّلت. سنُعلمك.",
     footerNote: "مجاني للتجربة. النسخة الإلكترونية متاحة، iOS قريباً.",
+    scrollHint: "مرر للأسفل للمتابعة",
   },
 
   es: {
@@ -166,6 +172,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "tu@correo.com",
     successMsg: "ya estás. te avisamos.",
     footerNote: "Gratis para probar. Web disponible, iOS próximamente.",
+    scrollHint: "Desplázate para continuar",
   },
 
   zh: {
@@ -188,6 +195,7 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "your@email.com",
     successMsg: "已记录。我们会通知你。",
     footerNote: "免费试用。网页版已上线，iOS 即将推出。",
+    scrollHint: "向下滑动继续",
   },
 
   ja: {
@@ -210,5 +218,6 @@ export const translations: Record<LangCode, Strings> = {
     emailPlaceholder: "your@email.com",
     successMsg: "登録しました。お知らせします。",
     footerNote: "無料でお試し。ウェブ版提供中、iOS 近日公開。",
+    scrollHint: "スクロールして続ける",
   },
 };
