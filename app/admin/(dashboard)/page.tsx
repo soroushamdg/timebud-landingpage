@@ -1,4 +1,4 @@
-import { getAllPostsForAdmin } from "@/lib/posts";
+import { getAllPostsForAdmin, getEffectiveStatus } from "@/lib/posts";
 import { PostRowActions } from "../components/PostRowActions";
 import { StatusBadge } from "../components/StatusBadge";
 
@@ -17,32 +17,35 @@ export default async function AdminDashboardPage() {
         <p>No posts yet. Create your first one.</p>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="pixel-border"
-              style={{
-                background: "var(--yellow)",
-                padding: "1.25rem 1.5rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "1rem",
-                flexWrap: "wrap",
-              }}
-            >
-              <div style={{ minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
-                  <strong style={{ fontSize: "1rem" }}>{post.title}</strong>
-                  <StatusBadge status={post.status} scheduledAt={post.scheduledAt} />
+          {posts.map((post) => {
+            const effectiveStatus = getEffectiveStatus(post);
+            return (
+              <div
+                key={post.id}
+                className="pixel-border"
+                style={{
+                  background: "var(--yellow)",
+                  padding: "1.25rem 1.5rem",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: "1rem",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", flexWrap: "wrap" }}>
+                    <strong style={{ fontSize: "1rem" }}>{post.title}</strong>
+                    <StatusBadge status={effectiveStatus} scheduledAt={post.scheduledAt} />
+                  </div>
+                  <p style={{ fontSize: "0.85rem", opacity: 0.75, margin: "0.4rem 0 0" }}>
+                    /blog/{post.slug} · {post.readingTimeMinutes} min read
+                  </p>
                 </div>
-                <p style={{ fontSize: "0.85rem", opacity: 0.75, margin: "0.4rem 0 0" }}>
-                  /blog/{post.slug} · {post.readingTimeMinutes} min read
-                </p>
+                <PostRowActions postId={post.id} status={effectiveStatus} />
               </div>
-              <PostRowActions postId={post.id} status={post.status} />
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

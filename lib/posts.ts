@@ -61,6 +61,17 @@ export async function getAllPostsForAdmin(): Promise<Post[]> {
   return db.select().from(posts).orderBy(desc(posts.createdAt));
 }
 
+// Mirrors isEffectivelyLive's "scheduled time has passed" check, but for admin-dashboard
+// display: the status column is never flipped from 'scheduled' to 'published' in the
+// background (no cron job — see isEffectivelyLive above), so without this a post that's
+// genuinely live on the public site would show "scheduled" forever in the admin list.
+export function getEffectiveStatus(post: Pick<Post, "status" | "scheduledAt">): Post["status"] {
+  if (post.status === "scheduled" && post.scheduledAt && post.scheduledAt <= new Date()) {
+    return "published";
+  }
+  return post.status;
+}
+
 export async function getPostById(id: string): Promise<Post | null> {
   const rows = await db.select().from(posts).where(eq(posts.id, id)).limit(1);
   return rows[0] ?? null;
