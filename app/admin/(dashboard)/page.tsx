@@ -1,5 +1,6 @@
 import { getAllPostsForAdmin, getEffectiveStatus } from "@/lib/posts";
 import { PostRowActions } from "../components/PostRowActions";
+import { PublishedDate } from "../components/PublishedDate";
 import { StatusBadge } from "../components/StatusBadge";
 
 export const dynamic = "force-dynamic";
@@ -40,6 +41,12 @@ export default async function AdminDashboardPage() {
                   </div>
                   <p style={{ fontSize: "0.85rem", opacity: 0.75, margin: "0.4rem 0 0" }}>
                     /blog/{post.slug} · {post.readingTimeMinutes} min read
+                    {(effectiveStatus === "published" || effectiveStatus === "hidden") && post.publishedAt ? (
+                      <>
+                        {" "}
+                        · <PublishedDate publishedAt={post.publishedAt} />
+                      </>
+                    ) : null}
                   </p>
                 </div>
                 <PostRowActions postId={post.id} status={effectiveStatus} />
