@@ -8,6 +8,7 @@ import { injectInternalLinks } from "@/lib/internal-links";
 import { SITE_URL } from "@/lib/site";
 import { PostMeta } from "../components/PostMeta";
 import { RelatedPosts } from "../components/RelatedPosts";
+import OpenAppButton from "../../components/OpenAppButton";
 
 // Dynamic (not ISR/SSG) so admin publish/edit/hide changes show up immediately,
 // and so `next build` never needs a live DB connection at build time.
@@ -83,6 +84,10 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      <div style={{ position: "fixed", top: "1.25rem", left: "1.25rem", zIndex: 9999 }}>
+        <OpenAppButton />
+      </div>
 
       <Link href="/blog" style={{ fontSize: "0.875rem", textDecoration: "underline" }}>
         ← All posts

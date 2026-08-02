@@ -5,6 +5,7 @@ import Link from "next/link";
 import WaitlistForm from "./components/WaitlistForm";
 import ScrollAnimations from "./components/ScrollAnimations";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import OpenAppButton from "./components/OpenAppButton";
 import { useLanguage } from "./components/LanguageProvider";
 import { translations } from "./i18n/translations";
 
@@ -31,8 +32,7 @@ export default function HomePage() {
 
   return (
     <>
-      <Link
-        href="/blog"
+      <div
         style={{
           position: "fixed",
           top: "1.25rem",
@@ -40,22 +40,32 @@ export default function HomePage() {
           zIndex: 9999,
           display: "flex",
           alignItems: "center",
-          gap: "0.4rem",
-          background: "#000",
-          color: "#FDC800",
-          border: "3px solid #000",
-          borderRadius: 0,
-          padding: "0.5rem 0.75rem",
-          fontFamily: "var(--font-pixel), monospace",
-          fontSize: "0.6rem",
-          lineHeight: 1,
-          boxShadow: "3px 3px 0 rgba(0,0,0,0.25)",
-          whiteSpace: "nowrap",
-          textDecoration: "none",
+          gap: "0.6rem",
         }}
       >
-        Blog
-      </Link>
+        <OpenAppButton />
+        <Link
+          href="/blog"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.4rem",
+            background: "#000",
+            color: "#FDC800",
+            border: "3px solid #000",
+            borderRadius: 0,
+            padding: "0.5rem 0.75rem",
+            fontFamily: "var(--font-pixel), monospace",
+            fontSize: "0.6rem",
+            lineHeight: 1,
+            boxShadow: "3px 3px 0 rgba(0,0,0,0.25)",
+            whiteSpace: "nowrap",
+            textDecoration: "none",
+          }}
+        >
+          Blog
+        </Link>
+      </div>
       <LanguageSwitcher />
       <div
         id="scroll-hint"
