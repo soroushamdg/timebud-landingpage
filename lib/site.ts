@@ -7,3 +7,6 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://i.usetimebud.
 // showing the "Open App" button, not a trusted auth check (the real session
 // cookie stays scoped to the app and stays HttpOnly).
 export const APP_LOGIN_COOKIE_NAME = "tb_logged_in";
+
+// Public Instagram profile — linked from the fixed nav on every page.
+export const INSTAGRAM_URL = "https://instagram.com/stopdeciding";

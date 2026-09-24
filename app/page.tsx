@@ -6,6 +6,7 @@ import WaitlistForm from "./components/WaitlistForm";
 import ScrollAnimations from "./components/ScrollAnimations";
 import LanguageSwitcher from "./components/LanguageSwitcher";
 import OpenAppButton from "./components/OpenAppButton";
+import InstagramLink from "./components/InstagramLink";
 import { useLanguage } from "./components/LanguageProvider";
 import { translations } from "./i18n/translations";
 
@@ -44,27 +45,10 @@ export default function HomePage() {
         }}
       >
         <OpenAppButton />
-        <Link
-          href="/blog"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "0.4rem",
-            background: "#000",
-            color: "#FDC800",
-            border: "3px solid #000",
-            borderRadius: 0,
-            padding: "0.5rem 0.75rem",
-            fontFamily: "var(--font-pixel), monospace",
-            fontSize: "0.6rem",
-            lineHeight: 1,
-            boxShadow: "3px 3px 0 rgba(0,0,0,0.25)",
-            whiteSpace: "nowrap",
-            textDecoration: "none",
-          }}
-        >
+        <Link href="/blog" className="nav-pill">
           Blog
         </Link>
+        <InstagramLink />
       </div>
       <LanguageSwitcher />
       <div

@@ -1,0 +1,176 @@
+/* ==========================================================
+   ADMIN — Blockwork on Glass
+   Scoped entirely under .tbadm so the pixel-art globals that style the public
+   site are left alone. Rule: if you can press it, it is moulded plastic; if it
+   floats above content, it is glass.
+
+   Three theme states, not two: bare :root is light, the media query covers the
+   unstamped "system" default, and the [data-theme] attribute lets an explicit
+   choice win in either direction. No colour is ever defined only inside a
+   media or attribute block.
+   ========================================================== */
+.tbadm {
+  --bg: #EDE9F0;
+  --card: #FFFDF7;
+  --card-2: #F6F1E4;
+  --ink: #1E1911;
+  --dim: #6B6353;
+  --faint: #948B79;
+  --line: #DED7C6;
+  --yl: #F5C518; --yl-l: #FFE270; --yl-d: #B8890A; --yl-ink: #3A2C00;
+  --pk: #E8004D; --pk-d: #8A002C; --warn-ink: #8A002C;
+  --gr: #22A45C; --gr-l: #5BD48C; --gr-d: #14713D;
+  --bl: #2E8FCC; --bl-d: #1B5C88;
+  --hot: #A87A00;
+  --mold: 0 3px 0 rgba(70,58,32,.13), 0 8px 18px -8px rgba(60,50,30,.32);
+  --sunk: inset 0 2px 4px rgba(70,58,32,.24);
+  --glass: rgba(255,255,255,.68);
+
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-family: "Nunito", var(--font-body), system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  .tbadm:not([data-theme="light"]) {
+    --bg: #121116; --card: #232128; --card-2: #1B1A20;
+    --ink: #F5F1E8; --dim: #9A9182; --faint: #786F60; --line: #33303A;
+    --yl-ink: #3A2C00; --hot: #F5C518; --warn-ink: #FF8FAF;
+    --mold: 0 3px 0 rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.06);
+    --sunk: inset 0 2px 4px rgba(0,0,0,.55);
+    --glass: rgba(34,32,40,.7);
+  }
+}
+.tbadm[data-theme="dark"] {
+  --bg: #121116; --card: #232128; --card-2: #1B1A20;
+  --ink: #F5F1E8; --dim: #9A9182; --faint: #786F60; --line: #33303A;
+  --yl-ink: #3A2C00; --hot: #F5C518; --warn-ink: #FF8FAF;
+  --mold: 0 3px 0 rgba(0,0,0,.62), inset 0 1px 0 rgba(255,255,255,.06);
+  --sunk: inset 0 2px 4px rgba(0,0,0,.55);
+  --glass: rgba(34,32,40,.7);
+}
+
+/* the public stylesheet forces every control square; the admin opts back out */
+.tbadm button,
+.tbadm input,
+.tbadm textarea,
+.tbadm select,
+.tbadm a[role="button"] { border-radius: 12px !important; }
+.tbadm img { image-rendering: auto; }
+
+.tbadm-bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+  padding: 12px 20px; border-bottom: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.tbadm-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: -.02em; }
+.tbadm-logo {
+  width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  background: linear-gradient(180deg, var(--yl-l), var(--yl) 55%, #E0AE0C);
+  color: var(--yl-ink); font-weight: 900; box-shadow: 0 2px 0 var(--yl-d);
+}
+.tbadm-nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.tbadm-nav a {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 14px; border-radius: 11px; min-height: 40px;
+  font-size: 14.5px; font-weight: 700; color: var(--dim); text-decoration: none;
+}
+.tbadm-nav a:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); color: var(--ink); }
+.tbadm-nav a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+.tbadm-count {
+  min-width: 21px; padding: 1px 7px; border-radius: 999px; font-size: 11.5px; font-weight: 900;
+  background: var(--pk); color: #fff;
+}
+.tbadm-main { max-width: 1060px; margin: 0 auto; padding: 30px 20px 80px; }
+
+.tbadm h1 {
+  font-family: "Bricolage Grotesque", var(--font-body), sans-serif;
+  font-size: 30px; font-weight: 800; letter-spacing: -.03em; margin: 0 0 6px;
+}
+.tbadm .sub { margin: 0 0 26px; color: var(--dim); font-size: 15.5px; max-width: 62ch; }
+
+/* moulded plastic: a hard bottom lip that collapses when pressed */
+.tbadm .key {
+  border: 0; cursor: pointer; font-family: inherit; font-weight: 800; font-size: 14.5px;
+  padding: 11px 18px; min-height: 42px; color: var(--yl-ink);
+  background: linear-gradient(180deg, var(--yl-l), var(--yl) 52%, #E0AE0C);
+  box-shadow: 0 4px 0 var(--yl-d), inset 0 2px 2px rgba(255,255,255,.7);
+  transition: transform .1s, box-shadow .1s;
+}
+.tbadm .key:active { transform: translateY(4px); box-shadow: 0 0 0 var(--yl-d); }
+.tbadm .key--ghost {
+  background: var(--card); color: var(--ink);
+  box-shadow: 0 3px 0 rgba(70,58,32,.2), inset 0 1px 0 rgba(255,255,255,.9);
+}
+.tbadm .key--danger { background: linear-gradient(180deg, #FF7FA8, var(--pk) 58%, #C4003F); color: #fff; box-shadow: 0 4px 0 var(--pk-d); }
+.tbadm .key--good { background: linear-gradient(180deg, var(--gr-l), var(--gr) 58%, #17864A); color: #fff; box-shadow: 0 4px 0 var(--gr-d); }
+.tbadm .key--sm { padding: 8px 13px; min-height: 38px; font-size: 13.5px; }
+.tbadm .key:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+.tbadm .card {
+  background: var(--card); border-radius: 18px; padding: 20px 22px;
+  box-shadow: var(--mold); display: grid; gap: 13px;
+}
+.tbadm .stack { display: grid; gap: 14px; }
+.tbadm .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.tbadm .spread { display: flex; gap: 14px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+.tbadm .lbl {
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 10.5px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin: 0;
+}
+.tbadm .muted { color: var(--dim); font-size: 14px; margin: 0; }
+.tbadm blockquote {
+  margin: 0; font-size: 18px; line-height: 1.55; font-weight: 600; color: var(--ink); text-wrap: pretty;
+}
+
+.tbadm .chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+  font-size: 11px; font-weight: 900; letter-spacing: .09em; text-transform: uppercase;
+}
+.tbadm .chip[data-s="pending"]  { background: color-mix(in srgb, var(--bl) 18%, transparent); color: var(--bl-d); }
+.tbadm .chip[data-s="approved"] { background: color-mix(in srgb, var(--gr) 20%, transparent); color: var(--gr-d); }
+.tbadm .chip[data-s="rejected"] { background: color-mix(in srgb, var(--ink) 12%, transparent); color: var(--dim); }
+.tbadm .chip[data-s="spam"]     { background: color-mix(in srgb, var(--pk) 16%, transparent); color: var(--warn-ink); }
+.tbadm .chip[data-s="featured"] { background: var(--yl); color: var(--yl-ink); }
+.tbadm[data-theme="dark"] .chip[data-s="pending"] { color: #8FD9FF; }
+.tbadm[data-theme="dark"] .chip[data-s="approved"] { color: var(--gr-l); }
+@media (prefers-color-scheme: dark) {
+  .tbadm:not([data-theme="light"]) .chip[data-s="pending"] { color: #8FD9FF; }
+  .tbadm:not([data-theme="light"]) .chip[data-s="approved"] { color: var(--gr-l); }
+}
+
+.tbadm .fld { display: grid; gap: 6px; }
+.tbadm .fld label { font-size: 13px; font-weight: 800; }
+.tbadm .fld input, .tbadm .fld textarea, .tbadm .fld select {
+  font-family: inherit; font-size: 15px; font-weight: 500; color: var(--ink);
+  width: 100%; padding: 11px 13px; min-height: 44px;
+  border: 1.5px solid var(--line); background: var(--bg);
+}
+.tbadm .fld textarea { min-height: 96px; resize: vertical; line-height: 1.5; }
+.tbadm .fld input:focus, .tbadm .fld textarea:focus, .tbadm .fld select:focus {
+  outline: 2.5px solid var(--yl); outline-offset: 1px; border-color: transparent;
+}
+.tbadm :focus-visible { outline: 2.5px solid var(--hot); outline-offset: 2px; }
+
+.tbadm .filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 22px; }
+.tbadm .filters a {
+  padding: 8px 14px; border-radius: 999px; min-height: 38px; display: inline-flex; align-items: center;
+  font-size: 13.5px; font-weight: 700; text-decoration: none; color: var(--dim);
+  background: var(--card); box-shadow: var(--mold);
+}
+.tbadm .filters a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+
+.tbadm .empty {
+  padding: 46px 24px; text-align: center; border-radius: 18px;
+  background: var(--card-2); color: var(--dim); font-weight: 600;
+}
+.tbadm .provenance {
+  border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 5px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 11.5px; color: var(--faint);
+}
+.tbadm .edited {
+  border-left: 3px solid var(--yl); padding-left: 12px; font-size: 13.5px; color: var(--dim);
+}

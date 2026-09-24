@@ -1,42 +1,50 @@
 import Link from "next/link";
 import { LogoutButton } from "../components/LogoutButton";
+import { AdminNav } from "../components/AdminNav";
+import { countPendingTestimonials } from "@/lib/testimonials";
+import "../admin.css";
 
-export default function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+export const dynamic = "force-dynamic";
+
+export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
+  // Surfaced in the nav so a submission cannot sit unreviewed just because
+  // nobody thought to open that page.
+  let pending = 0;
+  try {
+    pending = await countPendingTestimonials();
+  } catch {
+    // The testimonials table may not exist yet on a database that has not been
+    // migrated. A missing count must not take the whole admin down.
+    pending = 0;
+  }
+
   return (
-    <div style={{ minHeight: "100vh" }}>
-      <header
-        className="pixel-border-heavy"
-        style={{
-          borderTop: "none",
-          borderLeft: "none",
-          borderRight: "none",
-          background: "var(--black)",
-          color: "var(--yellow)",
-          padding: "1rem 1.5rem",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          flexWrap: "wrap",
-          gap: "1rem",
-        }}
-      >
-        <nav style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <Link href="/admin" className="display-font" style={{ fontSize: "0.8rem", color: "var(--yellow)" }}>
-            TimeBud Admin
-          </Link>
-          <Link href="/admin" style={{ color: "var(--yellow)", fontSize: "0.9rem" }}>
-            Posts
-          </Link>
-          <Link href="/admin/new" style={{ color: "var(--yellow)", fontSize: "0.9rem" }}>
-            + New post
-          </Link>
-          <Link href="/blog" style={{ color: "var(--yellow)", fontSize: "0.9rem", opacity: 0.7 }} target="_blank">
+    <div className="tbadm">
+      {/* The public site ships Geist; the admin's Blockwork styling wants the
+          display and mono faces too. A plain link rather than next/font so a
+          build with no network still succeeds — it just falls back. */}
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Nunito:wght@500;600;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      />
+      <header className="tbadm-bar">
+        <Link href="/admin" className="tbadm-brand" style={{ color: "inherit", textDecoration: "none" }}>
+          <span className="tbadm-logo" aria-hidden="true">T</span>
+          TimeBud Admin
+        </Link>
+        <AdminNav pendingTestimonials={pending} />
+        <div style={{ marginLeft: "auto", display: "flex", gap: 10, alignItems: "center" }}>
+          <Link
+            href="/blog"
+            target="_blank"
+            style={{ color: "var(--dim)", fontSize: 14, fontWeight: 700, textDecoration: "none" }}
+          >
             View blog ↗
           </Link>
-        </nav>
-        <LogoutButton />
+          <LogoutButton />
+        </div>
       </header>
-      <main style={{ padding: "2rem 1.5rem", maxWidth: "1000px", margin: "0 auto" }}>{children}</main>
+      <main className="tbadm-main">{children}</main>
     </div>
   );
 }

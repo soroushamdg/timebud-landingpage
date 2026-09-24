@@ -418,3 +418,115 @@ button, input, a[role="button"] {
   font-style: italic;
 }
 
+
+/* ── Fixed nav pills (Open App / Blog / Instagram) ───────────────────────── */
+.nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--black);
+  color: var(--yellow);
+  border: 3px solid var(--black);
+  border-radius: 0;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-pixel), monospace;
+  font-size: 0.6rem;
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
+    background 0.12s, color 0.12s;
+}
+
+.nav-pill:hover {
+  background: var(--yellow);
+  color: var(--black);
+  transform: translate(-2px, -2px);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.35);
+}
+
+.nav-pill:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.nav-pill:focus-visible {
+  outline: 3px solid var(--black);
+  outline-offset: 3px;
+}
+
+/* Non-Latin scripts can't render Press Start 2P */
+:lang(ar) .nav-pill,
+:lang(fa) .nav-pill,
+:lang(zh) .nav-pill,
+:lang(ja) .nav-pill {
+  font-family: var(--font-body), sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+/* Icon-only below 640px so the nav row still fits */
+@media (max-width: 640px) {
+  .nav-pill-label {
+    display: none;
+  }
+}
+
+/* ── Instagram glyph animations ──────────────────────────────────────────── */
+.ig-icon {
+  display: block;
+  flex-shrink: 0;
+  /* Idle: a short wiggle every ~6s so the pill catches the eye */
+  animation: ig-idle-wiggle 6s ease-in-out infinite;
+}
+
+.ig-lens,
+.ig-flash {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes ig-idle-wiggle {
+  0%, 84%, 100% { transform: scale(1) rotate(0deg); }
+  88% { transform: scale(1.15) rotate(-8deg); }
+  92% { transform: scale(1.15) rotate(8deg); }
+  96% { transform: scale(1) rotate(0deg); }
+}
+
+/* On hover the idle wiggle hands off to the "taking a photo" animation */
+.nav-pill:hover .ig-icon {
+  animation: none;
+}
+
+.nav-pill:hover .ig-lens {
+  animation: ig-lens-focus 0.9s ease-in-out infinite;
+}
+
+.nav-pill:hover .ig-flash {
+  animation: ig-flash-blink 0.9s steps(1) infinite;
+}
+
+@keyframes ig-lens-focus {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.28); }
+}
+
+@keyframes ig-flash-blink {
+  0%, 49% { opacity: 1; transform: scale(1); }
+  50%, 100% { opacity: 0.3; transform: scale(1.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-pill,
+  .ig-icon,
+  .nav-pill:hover .ig-lens,
+  .nav-pill:hover .ig-flash {
+    animation: none !important;
+    transition: background 0.12s, color 0.12s;
+  }
+  .nav-pill:hover,
+  .nav-pill:active {
+    transform: none;
+  }
+}

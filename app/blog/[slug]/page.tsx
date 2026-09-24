@@ -5,10 +5,11 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import { getPublishedPostByPreviousSlug, getPublishedPostBySlug, getRelatedPosts } from "@/lib/posts";
 import { mdxComponents } from "@/lib/mdx-components";
 import { injectInternalLinks } from "@/lib/internal-links";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, INSTAGRAM_URL } from "@/lib/site";
 import { PostMeta } from "../components/PostMeta";
 import { RelatedPosts } from "../components/RelatedPosts";
 import OpenAppButton from "../../components/OpenAppButton";
+import InstagramLink from "../../components/InstagramLink";
 
 // Dynamic (not ISR/SSG) so admin publish/edit/hide changes show up immediately,
 // and so `next build` never needs a live DB connection at build time.
@@ -73,7 +74,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
     datePublished: post.publishedAt?.toISOString(),
     dateModified: post.updatedAt.toISOString(),
     author: { "@type": "Organization", name: post.authorName },
-    publisher: { "@type": "Organization", name: "TimeBud" },
+    publisher: { "@type": "Organization", name: "TimeBud", sameAs: [INSTAGRAM_URL] },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/blog/${post.slug}` },
   };
 
@@ -85,8 +86,19 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div style={{ position: "fixed", top: "1.25rem", left: "1.25rem", zIndex: 9999 }}>
+      <div
+        style={{
+          position: "fixed",
+          top: "1.25rem",
+          left: "1.25rem",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+        }}
+      >
         <OpenAppButton />
+        <InstagramLink />
       </div>
 
       <Link href="/blog" style={{ fontSize: "0.875rem", textDecoration: "underline" }}>

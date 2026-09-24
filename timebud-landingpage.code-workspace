@@ -2,6 +2,12 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "../timebud-marketing-dashboard"
+		},
+		{
+			"path": "../timebud-ui"
 		}
 	],
 	"settings": {}

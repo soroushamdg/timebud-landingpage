@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getPublishedPosts } from "@/lib/posts";
 import { PostCard } from "./components/PostCard";
 import OpenAppButton from "../components/OpenAppButton";
+import InstagramLink from "../components/InstagramLink";
 
 export const metadata: Metadata = {
   title: "Blog — TimeBud",
@@ -29,8 +30,19 @@ export default async function BlogIndexPage() {
       className="section-padding"
       style={{ maxWidth: "1100px", margin: "0 auto", position: "relative", overflow: "hidden" }}
     >
-      <div style={{ position: "fixed", top: "1.25rem", left: "1.25rem", zIndex: 9999 }}>
+      <div
+        style={{
+          position: "fixed",
+          top: "1.25rem",
+          left: "1.25rem",
+          zIndex: 9999,
+          display: "flex",
+          alignItems: "center",
+          gap: "0.6rem",
+        }}
+      >
         <OpenAppButton />
+        <InstagramLink />
       </div>
       <Image
         src="/happy.png"
